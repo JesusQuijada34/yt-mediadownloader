@@ -1,4 +1,0 @@
-yt-dlp>=2024.4.9
-rich>=13.7.1
-questionary>=2.0.1
-

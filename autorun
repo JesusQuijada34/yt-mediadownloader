@@ -1,4 +1,59 @@
-#!usr/bin/env sh
-pip install -r "./lib/requirements.txt"
-clear
-/usr/bin/python3 "./yt-mediadownloader.py"
+#!/bin/bash
+
+echo "🎬 YouTube Media Downloader - Instalador Automático"
+echo "=================================================="
+echo ""
+
+# Verificar si Python está instalado
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Python 3 no está instalado. Por favor, instala Python 3.7+ primero."
+    echo "Descarga desde: https://www.python.org/downloads/"
+    exit 1
+fi
+
+# Verificar versión de Python
+python_version=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+required_version="3.7"
+
+if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" != "$required_version" ]; then
+    echo "❌ Se requiere Python 3.7 o superior. Versión actual: $python_version"
+    exit 1
+fi
+
+echo "✅ Python $python_version detectado"
+echo ""
+
+# Verificar si pip está instalado
+if ! command -v pip3 &> /dev/null; then
+    echo "❌ pip3 no está instalado. Por favor, instala pip3 primero."
+    exit 1
+fi
+
+echo "✅ pip3 detectado"
+echo ""
+
+# Actualizar pip
+echo "🔄 Actualizando pip..."
+pip3 install --upgrade pip
+
+# Instalar dependencias desde requirements.txt
+echo "📥 Instalando dependencias desde requirements.txt..."
+if [ -f "lib/requirements.txt" ]; then
+    pip3 install -r lib/requirements.txt
+else
+    echo "⚠️ No se encontró requirements.txt, instalando dependencias básicas..."
+    pip3 install yt-dlp PyQt5 PyQtWebEngine
+fi
+
+echo ""
+echo "✅ Instalación completada!"
+echo ""
+echo "🚀 Para ejecutar la aplicación:"
+echo "   python3 yt-mediadownloader.py"
+echo ""
+echo "📖 Para más información, consulta README.md"
+echo ""
+echo "🎬 ¡Disfruta descargando contenido de YouTube!"
+echo ""
+echo "💡 Consejo: Si encuentras problemas, ejecuta:"
+echo "   pip3 install --upgrade yt-dlp"
