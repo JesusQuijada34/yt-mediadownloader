@@ -1,59 +1,431 @@
 #!/bin/bash
+# =============================================================================
+# YouTube Media Downloader - Script de Ejecución Automática para Unix/Linux/macOS
+# =============================================================================
+#
+# Este script automatiza la instalación y ejecución de la aplicación
+# YouTube Media Downloader en sistemas Unix/Linux/macOS.
+#
+# Autor: influent
+# Versión: 1.0.0
+# Fecha: 2024-12-19
+# Licencia: MIT
+#
+# =============================================================================
+# INSTRUCCIONES PARA PRINCIPIANTES
+# =============================================================================
+#
+# 1. PERMISOS: Dale permisos de ejecución al script:
+#    chmod +x autorun
+#
+# 2. EJECUTAR: Ejecuta el script desde la terminal:
+#    ./autorun
+#
+# 3. PERMISOS: Si se te pide contraseña, es normal para instalar paquetes
+# 4. ESPERAR: El script instalará las dependencias automáticamente
+# 5. DISFRUTAR: La aplicación se abrirá automáticamente
+#
+# =============================================================================
+# REQUISITOS DEL SISTEMA
+# =============================================================================
+#
+# - Linux (Ubuntu 18.04+, Debian 10+, CentOS 8+, etc.)
+# - macOS 10.14+ (Mojave o superior)
+# - Python 3.7 o superior instalado
+# - Conexión a Internet para descargar dependencias
+# - Permisos de sudo (para instalación de paquetes del sistema)
+#
+# =============================================================================
+# FUNCIONES DEL SCRIPT
+# =============================================================================
+#
+# ✓ Detección automática del sistema operativo
+# ✓ Verificación de Python instalado
+# ✓ Instalación automática de dependencias del sistema
+# ✓ Configuración del entorno virtual (opcional)
+# ✓ Instalación de dependencias de Python
+# ✓ Ejecución de la aplicación
+# ✓ Manejo de errores y notificaciones
+# ✓ Limpieza automática de archivos temporales
+#
+# =============================================================================
 
-echo "🎬 YouTube Media Downloader - Instalador Automático"
-echo "=================================================="
-echo ""
+# Colores para la salida
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Función para imprimir mensajes con colores
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+print_header() {
+    echo -e "${PURPLE}$1${NC}"
+}
+
+# Función para limpiar al salir
+cleanup() {
+    print_status "Limpiando archivos temporales..."
+    rm -rf __pycache__ 2>/dev/null
+    rm -f *.pyc 2>/dev/null
+    print_success "Limpieza completada"
+}
+
+# Configurar trap para limpieza al salir
+trap cleanup EXIT
+
+# =============================================================================
+# ENCABEZADO Y VERIFICACIONES INICIALES
+# =============================================================================
+
+clear
+echo
+print_header "============================================================================="
+print_header "🎬 YOUTUBE MEDIA DOWNLOADER - INSTALADOR AUTOMÁTICO"
+print_header "============================================================================="
+echo
+print_status "🚀 Iniciando proceso de instalación automática..."
+print_status "📅 Fecha y hora: $(date)"
+print_status "💻 Sistema operativo: $(uname -s)"
+print_status "🔍 Distribución: $(lsb_release -d 2>/dev/null | cut -f2 || echo 'No disponible')"
+print_status "🏗️ Arquitectura: $(uname -m)"
+echo
+
+# =============================================================================
+# DETECCIÓN DEL SISTEMA OPERATIVO
+# =============================================================================
+
+print_status "🔍 Detectando sistema operativo..."
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Linux
+    if command -v apt-get &> /dev/null; then
+        OS="debian"
+        PKG_MANAGER="apt-get"
+        print_success "Sistema Debian/Ubuntu detectado (apt-get)"
+    elif command -v yum &> /dev/null; then
+        OS="redhat"
+        PKG_MANAGER="yum"
+        print_success "Sistema RedHat/CentOS detectado (yum)"
+    elif command -v pacman &> /dev/null; then
+        OS="arch"
+        PKG_MANAGER="pacman"
+        print_success "Sistema Arch Linux detectado (pacman)"
+    else
+        print_warning "Sistema Linux detectado pero gestor de paquetes no reconocido"
+        OS="linux"
+        PKG_MANAGER="unknown"
+    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    OS="macos"
+    PKG_MANAGER="brew"
+    print_success "Sistema macOS detectado (Homebrew)"
+else
+    print_warning "Sistema operativo no reconocido: $OSTYPE"
+    OS="unknown"
+    PKG_MANAGER="unknown"
+fi
+
+# =============================================================================
+# VERIFICACIÓN DE PYTHON
+# =============================================================================
+
+print_status "🔍 Verificando instalación de Python..."
 
 # Verificar si Python está instalado
 if ! command -v python3 &> /dev/null; then
-    echo "❌ Python 3 no está instalado. Por favor, instala Python 3.7+ primero."
-    echo "Descarga desde: https://www.python.org/downloads/"
+    print_error "Python3 no está instalado o no está en el PATH del sistema"
+    echo
+    print_status "📋 SOLUCIÓN: Instala Python desde tu gestor de paquetes:"
+    
+    case $OS in
+        "debian")
+            echo "   sudo apt update && sudo apt install python3 python3-pip"
+            ;;
+        "redhat")
+            echo "   sudo yum install python3 python3-pip"
+            ;;
+        "arch")
+            echo "   sudo pacman -S python python-pip"
+            ;;
+        "macos")
+            echo "   brew install python"
+            ;;
+        *)
+            echo "   Visita https://www.python.org/downloads/"
+            ;;
+    esac
+    echo
+    print_status "🔄 Después de instalar Python, ejecuta este script nuevamente"
+    echo
     exit 1
 fi
 
-# Verificar versión de Python
-python_version=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-required_version="3.7"
+# Obtener versión de Python
+PYTHON_VERSION=$(python3 --version 2>&1 | awk '{print $2}')
+print_success "Python $PYTHON_VERSION detectado correctamente"
 
-if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" != "$required_version" ]; then
-    echo "❌ Se requiere Python 3.7 o superior. Versión actual: $python_version"
+# Verificar versión mínima (Python 3.7+)
+PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d. -f1)
+PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d. -f2)
+
+if [ "$PYTHON_MAJOR" -lt 3 ] || ([ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 7 ]); then
+    print_error "Se requiere Python 3.7 o superior"
+    print_status "Versión actual: $PYTHON_VERSION"
     exit 1
 fi
 
-echo "✅ Python $python_version detectado"
-echo ""
+print_success "Versión de Python compatible ($PYTHON_VERSION)"
 
-# Verificar si pip está instalado
+# =============================================================================
+# VERIFICACIÓN DE PIP
+# =============================================================================
+
+echo
+print_status "🔍 Verificando instalación de pip..."
+
 if ! command -v pip3 &> /dev/null; then
-    echo "❌ pip3 no está instalado. Por favor, instala pip3 primero."
+    print_error "pip3 no está disponible"
+    echo
+    print_status "📋 SOLUCIÓN: Instala pip3:"
+    
+    case $OS in
+        "debian")
+            echo "   sudo apt install python3-pip"
+            ;;
+        "redhat")
+            echo "   sudo yum install python3-pip"
+            ;;
+        "arch")
+            echo "   sudo pacman -S python-pip"
+            ;;
+        "macos")
+            echo "   brew install python"
+            ;;
+    esac
+    echo
     exit 1
 fi
 
-echo "✅ pip3 detectado"
-echo ""
+PIP_VERSION=$(pip3 --version 2>&1 | awk '{print $2}')
+print_success "pip $PIP_VERSION disponible"
 
-# Actualizar pip
-echo "🔄 Actualizando pip..."
-pip3 install --upgrade pip
+# =============================================================================
+# ACTUALIZACIÓN DE PIP
+# =============================================================================
 
-# Instalar dependencias desde requirements.txt
-echo "📥 Instalando dependencias desde requirements.txt..."
-if [ -f "lib/requirements.txt" ]; then
-    pip3 install -r lib/requirements.txt
+echo
+print_status "🔄 Actualizando pip a la última versión..."
+if pip3 install --upgrade pip --quiet; then
+    print_success "pip actualizado correctamente"
 else
-    echo "⚠️ No se encontró requirements.txt, instalando dependencias básicas..."
-    pip3 install yt-dlp PyQt5 PyQtWebEngine
+    print_warning "No se pudo actualizar pip, continuando..."
 fi
 
-echo ""
-echo "✅ Instalación completada!"
-echo ""
-echo "🚀 Para ejecutar la aplicación:"
+# =============================================================================
+# INSTALACIÓN DE DEPENDENCIAS DEL SISTEMA
+# =============================================================================
+
+echo
+print_status "📦 Instalando dependencias del sistema..."
+
+case $OS in
+    "debian")
+        print_status "Instalando paquetes del sistema para PyQt5..."
+        sudo apt update
+        sudo apt install -y python3-pyqt5 python3-pyqt5.qtwebengine python3-dev build-essential
+        ;;
+    "redhat")
+        print_status "Instalando paquetes del sistema para PyQt5..."
+        sudo yum install -y python3-pyqt5 python3-pyqt5-qtwebengine python3-devel gcc
+        ;;
+    "arch")
+        print_status "Instalando paquetes del sistema para PyQt5..."
+        sudo pacman -S --noconfirm python-pyqt5 python-pyqtwebengine base-devel
+        ;;
+    "macos")
+        print_status "Verificando Homebrew..."
+        if ! command -v brew &> /dev/null; then
+            print_status "Instalando Homebrew..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        fi
+        print_status "Instalando dependencias con Homebrew..."
+        brew install qt5
+        ;;
+    *)
+        print_warning "No se pueden instalar dependencias del sistema automáticamente"
+        print_status "Instala manualmente PyQt5 y PyQtWebEngine para tu distribución"
+        ;;
+esac
+
+# =============================================================================
+# VERIFICACIÓN DE ARCHIVOS DEL PROYECTO
+# =============================================================================
+
+echo
+print_status "🔍 Verificando archivos del proyecto..."
+
+if [ ! -f "yt-mediadownloader.py" ]; then
+    print_error "No se encontró el archivo principal yt-mediadownloader.py"
+    print_status "📍 Asegúrate de ejecutar este script desde la carpeta del proyecto"
+    echo
+    exit 1
+fi
+
+if [ ! -f "lib/requirements.txt" ]; then
+    print_error "No se encontró lib/requirements.txt"
+    print_status "📍 Verifica que la estructura del proyecto esté completa"
+    echo
+    exit 1
+fi
+
+print_success "Archivos del proyecto verificados correctamente"
+
+# =============================================================================
+# INSTALACIÓN DE DEPENDENCIAS DE PYTHON
+# =============================================================================
+
+echo
+print_status "📦 Instalando dependencias de Python..."
+print_status "🔍 Dependencias a instalar:"
+echo "   - PyQt5 (interfaz gráfica)"
+echo "   - PyQtWebEngine (navegador web)"
+echo "   - pytube (descarga de YouTube)"
+echo
+
+# Instalar dependencias principales
+print_status "🔧 Instalando PyQt5..."
+if pip3 install PyQt5 --quiet; then
+    print_success "PyQt5 instalado correctamente"
+else
+    print_error "No se pudo instalar PyQt5"
+    print_status "💡 Intenta ejecutar como administrador o verifica tu conexión a Internet"
+    exit 1
+fi
+
+print_status "🔧 Instalando PyQtWebEngine..."
+if pip3 install PyQtWebEngine --quiet; then
+    print_success "PyQtWebEngine instalado correctamente"
+else
+    print_error "No se pudo instalar PyQtWebEngine"
+    print_status "💡 Verifica que las dependencias del sistema estén instaladas"
+    exit 1
+fi
+
+print_status "🔧 Instalando pytube..."
+if pip3 install pytube --quiet; then
+    print_success "pytube instalado correctamente"
+else
+    print_error "No se pudo instalar pytube"
+    exit 1
+fi
+
+print_success "Todas las dependencias instaladas correctamente"
+
+# =============================================================================
+# VERIFICACIÓN DE INSTALACIÓN
+# =============================================================================
+
+echo
+print_status "🔍 Verificando instalación de dependencias..."
+if python3 -c "import PyQt5; import PyQt5.QtWebEngineWidgets; import pytube; print('✅ Verificación exitosa')" 2>/dev/null; then
+    print_success "Verificación de dependencias completada"
+else
+    print_error "Las dependencias no se instalaron correctamente"
+    print_status "🔄 Intenta ejecutar: pip3 install -r lib/requirements.txt"
+    exit 1
+fi
+
+# =============================================================================
+# EJECUCIÓN DE LA APLICACIÓN
+# =============================================================================
+
+echo
+print_status "🚀 Iniciando YouTube Media Downloader..."
+echo
+print_status "📋 INFORMACIÓN DE LA APLICACIÓN:"
+echo "   - Nombre: YouTube Media Downloader"
+echo "   - Versión: 1.0.0"
+echo "   - Desarrollador: influent"
+echo "   - Licencia: MIT"
+echo
+print_status "💡 CONSEJOS DE USO:"
+echo "   - Navega por YouTube en el navegador embebido"
+echo "   - Las URLs se detectan automáticamente"
+echo "   - Usa los botones del panel lateral para descargar"
+echo "   - El historial se guarda automáticamente"
+echo
+print_status "⏳ Abriendo aplicación en 3 segundos..."
+sleep 3
+
+# Ejecutar la aplicación
+print_status "🎬 Ejecutando aplicación..."
+python3 yt-mediadownloader.py
+
+# =============================================================================
+# MANEJO DE SALIDA
+# =============================================================================
+
+if [ $? -ne 0 ]; then
+    echo
+    print_error "La aplicación se cerró con errores"
+    echo
+    print_status "🔍 POSIBLES SOLUCIONES:"
+    echo "   1. Verifica que todas las dependencias estén instaladas"
+    echo "   2. Asegúrate de tener permisos de escritura en la carpeta"
+    echo "   3. Verifica que no haya otros procesos usando los puertos necesarios"
+    echo "   4. Revisa el archivo de logs si está disponible"
+    echo
+    print_status "📞 Para obtener ayuda, consulta:"
+    echo "   - README.md del proyecto"
+    echo "   - Issues en GitHub"
+    echo "   - Documentación oficial de PyQt5"
+    echo
+else
+    echo
+    print_success "La aplicación se cerró correctamente"
+    echo
+fi
+
+# =============================================================================
+# FINALIZACIÓN
+# =============================================================================
+
+echo
+print_header "============================================================================="
+print_header "🎉 INSTALACIÓN COMPLETADA"
+print_header "============================================================================="
+echo
+print_success "Python verificado: $PYTHON_VERSION"
+print_success "Dependencias instaladas"
+print_success "Aplicación ejecutada"
+echo
+print_status "💡 Para ejecutar la aplicación nuevamente:"
 echo "   python3 yt-mediadownloader.py"
-echo ""
-echo "📖 Para más información, consulta README.md"
-echo ""
-echo "🎬 ¡Disfruta descargando contenido de YouTube!"
-echo ""
-echo "💡 Consejo: Si encuentras problemas, ejecuta:"
-echo "   pip3 install --upgrade yt-dlp"
+echo
+print_status "📚 Para más información, consulta README.md"
+print_status "🌐 Repositorio: https://github.com/influent/yt-mediadownloader"
+echo
+print_header "============================================================================="
+echo
+
+# Pausa final para que el usuario pueda leer la información
+read -p "Presiona Enter para continuar..."

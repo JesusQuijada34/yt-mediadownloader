@@ -1,15 +1,60 @@
 # Dependencias del paquete YouTube Media Downloader
 # Versión mínima requerida de Python: 3.7
+#
+# Este archivo contiene todas las dependencias necesarias para ejecutar
+# la aplicación YouTube Media Downloader. Instala estas dependencias
+# antes de ejecutar la aplicación.
 
-# Interfaz gráfica
+# =============================================================================
+# DEPENDENCIAS PRINCIPALES (OBLIGATORIAS)
+# =============================================================================
+
+# Interfaz gráfica de usuario con PyQt5
 PyQt5>=5.15.9
-PyQtWebEngine>=5.15.6
 PyQt5-sip>=12.12.2
 
-# Descarga de medios
-yt-dlp>=2024.4.9
+# Motor web embebido para navegación
+PyQtWebEngine>=5.15.6
 
-# Utilidades adicionales (opcionales)
+# Biblioteca para descarga de videos de YouTube
+pytube>=15.0.0
+
+# =============================================================================
+# DEPENDENCIAS ADICIONALES (OPCIONALES)
+# =============================================================================
+
+# Mejoras en la interfaz de consola
 rich>=13.7.1
+
+# Interfaz interactiva para selección de opciones
 questionary>=2.0.1
+
+# =============================================================================
+# DEPENDENCIAS DE DESARROLLO (SOLO PARA DESARROLLADORES)
+# =============================================================================
+
+# Herramientas de desarrollo (comentadas por defecto)
+# pytest>=7.0.0
+# black>=23.0.0
+# flake8>=6.0.0
+# mypy>=1.0.0
+
+# =============================================================================
+# NOTAS IMPORTANTES
+# =============================================================================
+#
+# 1. PyQt5 requiere Qt5 instalado en el sistema
+# 2. PyQtWebEngine es necesario para el navegador embebido
+# 3. pytube es la biblioteca principal para descargas de YouTube
+# 4. En sistemas Linux, puede ser necesario instalar paquetes adicionales:
+#    sudo apt-get install python3-pyqt5 python3-pyqt5.qtwebengine
+#
+# =============================================================================
+# INSTALACIÓN RÁPIDA
+# =============================================================================
+#
+# pip install -r lib/requirements.txt
+#
+# O instalar manualmente:
+# pip install PyQt5 PyQtWebEngine pytube
 
