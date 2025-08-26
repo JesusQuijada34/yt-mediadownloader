@@ -6,7 +6,7 @@ Disfruta de una interfaz moderna, oscura y amigable, con un navegador integrado 
 ![ytmd](assets/splash.png)
 ---
 
-## 🚀 ¿Qué es YT Media Downloader?
+## <img src="app/app-icon.ico" alt="Icono" width="50" height="50" style="vertical-align: middle;"/>  ¿Qué es YT Media Downloader?
 
 **YT Media Downloader** es una aplicación de escritorio multiplataforma (Windows, Linux, macOS) que te permite descargar tus reels y videos favoritos en formato **MP4** (video) o **MP3** (audio) con solo un clic.  
 Ideal para guardar contenido de Youtube de manera fácil y ordenada.
