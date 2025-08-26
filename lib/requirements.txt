@@ -58,3 +58,6 @@ questionary>=2.0.1
 # O instalar manualmente:
 # pip install PyQt5 PyQtWebEngine pytube
 
+PyQtWebEngine
+PyQt5
+yt-dlp
