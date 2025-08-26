@@ -3,6 +3,7 @@
 ¡Descarga videos y audios de **Youtube** y videos públicos de forma rápida y sencilla!  
 Disfruta de una interfaz moderna, oscura y amigable, con un navegador integrado para que no tengas que copiar y pegar enlaces.
 
+![ytmd](assets/splash.png)
 ---
 
 ## 🚀 ¿Qué es YT Media Downloader?
