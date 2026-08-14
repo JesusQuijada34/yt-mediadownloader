@@ -4,7 +4,6 @@ Setup script for YouTube Media Downloader
 """
 
 from setuptools import setup, find_packages
-import os
 
 # Read the README file
 def read_readme():
@@ -23,7 +22,7 @@ setup(
     description="Una aplicación de escritorio moderna para descargar contenido de YouTube",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/tu-usuario/yt-mediadownloader",
+    url="https://github.com/JesusQuijada34/yt-mediadownloader",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -45,19 +44,14 @@ setup(
     ],
     python_requires=">=3.7",
     install_requires=read_requirements(),
-    entry_points={
-        "console_scripts": [
-            "yt-mediadownloader=yt_mediadownloader:main",
-        ],
-    },
     include_package_data=True,
     package_data={
         "": ["*.md", "*.txt", "*.ico", "*.png"],
     },
     keywords="youtube, downloader, media, video, audio, gui, pyqt5",
     project_urls={
-        "Bug Reports": "https://github.com/tu-usuario/yt-mediadownloader/issues",
-        "Source": "https://github.com/tu-usuario/yt-mediadownloader",
-        "Documentation": "https://github.com/tu-usuario/yt-mediadownloader#readme",
+        "Bug Reports": "https://github.com/JesusQuijada34/yt-mediadownloader/issues",
+        "Source": "https://github.com/JesusQuijada34/yt-mediadownloader",
+        "Documentation": "https://github.com/JesusQuijada34/yt-mediadownloader#readme",
     },
 )
